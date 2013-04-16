@@ -778,21 +778,21 @@ class HyASTCompiler(object):
                           col_offset=operator.start_column,
                           values=values)
 
-    @builds("=")
-    @builds("!=")
-    @builds("<")
-    @builds("<=")
-    @builds(">")
-    @builds(">=")
+    @builds("__eq__")
+    @builds("__ne__")
+    @builds("__lt__")
+    @builds("__le__")
+    @builds("__gt__")
+    @builds("__ge__")
     @builds("is")
     @builds("in")
     @builds("is_not")
     @builds("not_in")
     @checkargs(min=2)
     def compile_compare_op_expression(self, expression):
-        ops = {"=": ast.Eq, "!=": ast.NotEq,
-               "<": ast.Lt, "<=": ast.LtE,
-               ">": ast.Gt, ">=": ast.GtE,
+        ops = {"__eq__": ast.Eq, "__ne__": ast.NotEq,
+               "__lt__": ast.Lt, "__le__": ast.LtE,
+               "__gt__": ast.Gt, "__ge__": ast.GtE,
                "is": ast.Is, "is_not": ast.IsNot,
                "in": ast.In, "not_in": ast.NotIn}
 
@@ -807,17 +807,17 @@ class HyASTCompiler(object):
                            lineno=e.start_line,
                            col_offset=e.start_column)
 
-    @builds("+")
-    @builds("%")
-    @builds("/")
-    @builds("//")
-    @builds("*")
-    @builds("**")
-    @builds("<<")
-    @builds(">>")
-    @builds("|")
-    @builds("^")
-    @builds("&")
+    @builds("__add__")
+    @builds("__mod__")
+    @builds("__div__")
+    @builds("__floordiv__")
+    @builds("__mult__")
+    @builds("__pow__")
+    @builds("__lshift__")
+    @builds("__rshift__")
+    @builds("__or__")
+    @builds("__xor__")
+    @builds("__and__")
     @checkargs(min=2)
     def compile_maths_expression(self, expression):
         ops = {"+": ast.Add,
@@ -831,7 +831,19 @@ class HyASTCompiler(object):
                ">>": ast.RShift,
                "|": ast.BitOr,
                "^": ast.BitXor,
-               "&": ast.BitAnd}
+               "&": ast.BitAnd,
+               "__add__": ast.Add,
+               "__div__": ast.Div,
+               "__floordiv__": ast.FloorDiv,
+               "__mult__": ast.Mult,
+               "__sub__": ast.Sub,
+               "__mod__": ast.Mod,
+               "__pow__": ast.Pow,
+               "__lshift__": ast.LShift,
+               "__rshift__": ast.RShift,
+               "__or__": ast.BitOr,
+               "__xor__": ast.BitXor,
+               "__and__": ast.BitAnd}
 
         inv = expression.pop(0)
         op = ops[inv]
@@ -847,7 +859,7 @@ class HyASTCompiler(object):
             left = calc
         return calc
 
-    @builds("-")
+    @builds("__sub__")
     @checkargs(min=1)
     def compile_maths_expression_sub(self, expression):
         if len(expression) > 2:
