@@ -59,7 +59,7 @@ def _resolve_atom(obj):
     except ValueError:
         pass
 
-    if obj.startswith("&"):
+    if obj.startswith("&") and obj != "&":
         return HyLambdaListKeyword(obj)
 
     try:

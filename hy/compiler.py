@@ -1145,6 +1145,10 @@ class HyASTCompiler(object):
 
     @builds(HySymbol)
     def compile_symbol(self, symbol):
+        replacement = self.special_symbols.get(symbol, None)
+        if replacement is not None:
+            symbol = HySymbol(replacement).replace(symbol)
+
         if "." in symbol:
             glob, local = symbol.rsplit(".", 1)
             glob = HySymbol(glob)
@@ -1163,6 +1167,43 @@ class HyASTCompiler(object):
                         ctx=ast.Load(),
                         lineno=symbol.start_line,
                         col_offset=symbol.start_column)
+
+    special_symbols = {"<": "operator.lt",
+                       "<=": "operator.le",
+                       "=": "operator.eq",
+                       "==": "operator.eq",
+                       "!=": "operator.ne",
+                       ">=": "operator.ge",
+                       ">": "operator.gt",
+                       "not": "operator.not_",
+                       "is": "operator.is_",
+                       "in": "operator.contains",
+                       "&": "operator.and_",
+                       "|": "operator.or_",
+                       "^": "operator.xor",
+                       "~": "operator.inv",
+                       "<<": "operator.lshift",
+                       ">>": "operator.rshift",
+                       "+": "operator.add",
+                       "-": "operator.sub",
+                       "*": "operator.mul",
+                       "/": "operator.truediv",
+                       "//": "operator.floordiv",
+                       "%": "operator.mod",
+                       "**": "operator.pow",
+                       "+=": "operator.iadd",
+                       "-=": "operator.isub",
+                       "*=": "operator.imul",
+                       "/=": "operator.itruediv",
+                       "//=": "operator.ifloordiv",
+                       "%=": "operator.imod",
+                       "**=": "operator.ipow",
+                       "&=": "operator.iand",
+                       "|=": "operator.ior",
+                       "^=": "operator.ixor",
+                       "~=": "operator.iinv",
+                       "<<=": "operator.ilshift",
+                       ">>=": "operator.irshift"}
 
     @builds(HyString)
     def compile_string(self, string):

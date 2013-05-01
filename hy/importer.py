@@ -74,6 +74,7 @@ def import_file_to_module(module_name, fpath):
     _ast = import_file_to_ast(fpath)
     mod = imp.new_module(module_name)
     mod.__file__ = fpath
+    eval(compile("import operator", "", "exec"), mod.__dict__)
     eval(ast_compile(_ast, fpath, "exec"), mod.__dict__)
     return mod
 
@@ -81,6 +82,7 @@ def import_file_to_module(module_name, fpath):
 def import_buffer_to_module(module_name, buf):
     _ast = import_buffer_to_ast(buf)
     mod = imp.new_module(module_name)
+    eval(compile("import operator", "", "exec"), mod.__dict__)
     eval(ast_compile(_ast, "", "exec"), mod.__dict__)
     return mod
 

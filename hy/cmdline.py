@@ -26,6 +26,7 @@
 
 import ast
 import code
+import operator
 import optparse
 import os
 import readline
@@ -51,6 +52,13 @@ _machine = Machine(Idle, 1, 0)
 
 
 class HyREPL(code.InteractiveConsole):
+
+    def __init__(self, locals=None, filename="<console>"):
+        if locals is None:
+            locals = {"__name__": "__console__", "__doc__": None,
+                      "operator": operator}
+        code.InteractiveConsole.__init__(self, locals, filename)
+
     def runsource(self, source, filename='<input>', symbol='single'):
         global _machine
 
