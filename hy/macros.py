@@ -20,11 +20,13 @@
 
 from hy.models.expression import HyExpression
 from hy.models.string import HyString
+from hy.models.symbol import HySymbol
 from hy.models.list import HyList
 
 from collections import defaultdict
 
 _hy_macros = defaultdict(dict)
+_hy_macro_handlers = {}
 
 
 def macro(name):
@@ -44,13 +46,29 @@ def require(source_module_name, target_module_name):
         refs[name] = macro
 
 
+def set_macro_handler(symbol, handler):
+    _hy_macro_handlers[symbol] = handler
+
+
+def default_handler(tree, module_name):
+    return HyExpression([tree[0]] +
+                        [process(x, module_name) for x in tree[1:]])
+
+
+def no_macro_expansion(tree, module_name):
+    return tree
+
+
 def process(tree, module_name):
     if isinstance(tree, HyExpression):
         fn = tree[0]
-        if fn in ("quote", "quasiquote"):
-            return tree
-        ntree = HyExpression([fn] + [process(x, module_name) for x in tree[1:]])
-        ntree.replace(tree)
+        if isinstance(fn, HyString):
+            handler = _hy_macro_handlers.get(fn, default_handler)
+            ntree = handler(tree, module_name)
+        else:
+            ntree = default_handler(tree, module_name)
+        if ntree is not tree:
+            ntree.replace(tree)
 
         if isinstance(fn, HyString):
             m = _hy_macros[module_name].get(fn)

@@ -40,7 +40,7 @@ from hy.core import process
 
 from hy.util import str_type
 
-from hy.macros import require
+import hy.macros
 
 import codecs
 import traceback
@@ -95,7 +95,7 @@ def ast_str(foobar):
     return "hy_%s" % (str(foobar).replace("-", "_"))
 
 
-def builds(_type):
+def builds(_type, macro_handler=None):
 
     unpythonic_chars = ["-"]
     really_ok = ["-"]
@@ -106,6 +106,8 @@ def builds(_type):
 
     def _dec(fn):
         _compile_table[_type] = fn
+        if macro_handler is not None:
+            hy.macros.set_macro_handler(_type, macro_handler)
         return fn
     return _dec
 
@@ -389,7 +391,6 @@ class HyASTCompiler(object):
             raise
         except Exception as e:
             raise HyCompileError(e, sys.exc_info()[2])
-
         raise HyCompileError(Exception("Unknown type: `%s'" % _type))
 
     def _compile_collect(self, exprs):
@@ -583,8 +584,8 @@ class HyASTCompiler(object):
         return imports, HyExpression([HySymbol(name),
                                       form]).replace(form), False
 
-    @builds("quote")
-    @builds("quasiquote")
+    @builds("quote", macro_handler=hy.macros.no_macro_expansion)
+    @builds("quasiquote", macro_handler=hy.macros.no_macro_expansion)
     @checkargs(exact=1)
     def compile_quote(self, entries):
         if entries[0] == "quote":
@@ -988,7 +989,7 @@ class HyASTCompiler(object):
 
         return ret
 
-    @builds("import")
+    @builds("import", macro_handler=hy.macros.no_macro_expansion)
     def compile_import_expression(self, expr):
         def _compile_import(expr, module, names=None, importer=ast.Import):
             if not names:
@@ -1243,7 +1244,7 @@ class HyASTCompiler(object):
         expression.pop(0)
         for entry in expression:
             __import__(entry)  # Import it fo' them macros.
-            require(entry, self.module_name)
+            hy.macros.require(entry, self.module_name)
         return Result()
 
     @builds("and")
