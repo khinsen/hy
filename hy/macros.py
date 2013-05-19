@@ -59,6 +59,22 @@ def no_macro_expansion(tree, module_name):
     return tree
 
 
+def try_expr(tree, module_name):
+
+    def clause_handler(tree, module_name):
+        if isinstance(tree, HyExpression) and len(tree) > 1:
+            return default_handler(tree, module_name)
+        else:
+            return tree
+
+    if len(tree) == 1:
+        # Emtpy (try)
+        return tree
+    body = process(tree[1], module_name)
+    clauses = [clause_handler(x, module_name) for x in tree[2:]]
+    return HyExpression([tree[0], body] + clauses)
+
+
 def process(tree, module_name):
     if isinstance(tree, HyExpression):
         fn = tree[0]

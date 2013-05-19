@@ -645,7 +645,7 @@ class HyASTCompiler(object):
 
         return ret
 
-    @builds("try")
+    @builds("try", macro_handler=hy.macros.try_expr)
     def compile_try_expression(self, expr):
         expr.pop(0)  # try
 
