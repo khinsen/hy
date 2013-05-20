@@ -75,6 +75,23 @@ def try_expr(tree, module_name):
     return HyExpression([tree[0], body] + clauses)
 
 
+def with_expr(tree, module_name):
+    # (with [fd (open "README.md" "r")] (assert fd))
+    # (with [(open "README.md" "r")] (do)))
+    pass
+
+
+def list_comp_expr(tree, module_name):
+    # (assert (= (list-comp (* x 2) (x (range 2))) [0 2]))
+    # (assert (= (list-comp (* x 2) (x (range 4)) (% x 2)) [2 6]))
+    # (assert (= (sorted (list-comp (* y 2) ((, x y) (.items {"1" 1 "2" 2}))))
+    #            [2 4]))
+    # (assert (= (list-comp (, x y) (x (range 2) y (range 2)))
+    #            [(, 0 0) (, 0 1) (, 1 0) (, 1 1)]))
+    # (assert (= (list-comp j (j [1 2])) [1 2])))
+    pass
+
+
 def process(tree, module_name):
     if isinstance(tree, HyExpression):
         fn = tree[0]

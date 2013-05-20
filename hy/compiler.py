@@ -962,7 +962,7 @@ class HyASTCompiler(object):
 
         return ret
 
-    @builds("global")
+    @builds("global", macro_handler=hy.macros.no_macro_expansion)
     @checkargs(1)
     def compile_global_expression(self, expr):
         expr.pop(0)  # global
@@ -1125,7 +1125,7 @@ class HyASTCompiler(object):
         fn.stmts[-1].decorator_list = decorators
         return ret + fn
 
-    @builds("with")
+    @builds("with", macro_handler=hy.macros.with_expr)
     @checkargs(min=2)
     def compile_with_expression(self, expr):
         expr.pop(0)  # with
@@ -1234,7 +1234,7 @@ class HyASTCompiler(object):
                                col_offset=operator.start_column)
         return operand
 
-    @builds("require")
+    @builds("require", macro_handler=hy.macros.no_macro_expansion)
     def compile_require(self, expression):
         """
         TODO: keep track of what we've imported in this run and then
