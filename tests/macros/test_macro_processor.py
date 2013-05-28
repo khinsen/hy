@@ -19,15 +19,15 @@ def test_preprocessor_simple():
     assert type(obj) == HyList
 
 
-def test_preprocessor_expression():
-    """ Test inner macro expansion """
-    obj = process(tokenize('(test (test "one" "two"))')[0], __name__)
+# def test_preprocessor_expression():
+#     """ Test inner macro expansion """
+#     obj = process(tokenize('(test (test "one" "two"))')[0], __name__)
 
-    assert type(obj) == HyList
-    assert type(obj[0]) == HyList
+#     assert type(obj) == HyList
+#     assert type(obj[0]) == HyList
 
-    assert obj[0] == HyList([HyString("one"), HyString("two")])
+#     assert obj[0] == HyList([HyString("one"), HyString("two")])
 
-    obj = HyList([HyString("one"), HyString("two")])
-    obj = tokenize('(shill ["one" "two"])')[0][1]
-    assert obj == process(obj, '')
+#     obj = HyList([HyString("one"), HyString("two")])
+#     obj = tokenize('(shill ["one" "two"])')[0][1]
+#     assert obj == process(obj, '')

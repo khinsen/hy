@@ -47,22 +47,15 @@ def require(source_module_name, target_module_name):
 def process(tree, module_name):
     if isinstance(tree, HyExpression):
         fn = tree[0]
-        if fn in ("quote", "quasiquote"):
-            return tree
-        ntree = HyExpression([fn] + [process(x, module_name) for x in tree[1:]])
-        ntree.replace(tree)
-
         if isinstance(fn, HyString):
             m = _hy_macros[module_name].get(fn)
             if m is None:
                 m = _hy_macros[None].get(fn)
             if m is not None:
-                obj = m(*ntree[1:])
-                obj.replace(tree)
-                return obj
-
-        ntree.replace(tree)
-        return ntree
+                ntree = m(*tree[1:])
+                ntree.replace(tree)
+                return ntree
+        return tree
 
     if isinstance(tree, HyList):
         obj = tree.__class__([process(x, module_name) for x in tree])  # NOQA
