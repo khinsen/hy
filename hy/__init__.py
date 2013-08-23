@@ -28,7 +28,7 @@ from hy.models.integer import HyInteger  # NOQA
 from hy.models.keyword import HyKeyword  # NOQA
 from hy.models.complex import HyComplex  # NOQA
 from hy.models.string import HyString  # NOQA
-from hy.models.symbol import HySymbol  # NOQA
+from hy.models.symbol import HySymbol, HyNamespacedSymbol  # NOQA
 from hy.models.float import HyFloat  # NOQA
 from hy.models.dict import HyDict  # NOQA
 from hy.models.list import HyList  # NOQA

@@ -28,3 +28,20 @@ class HySymbol(HyString):
 
     def __init__(self, string):
         self += string
+
+    def __getattr__(self, attr):
+        if attr == "namespace":
+            if attr not in self.__dict__:
+                return None
+            return self.__dict__[attr]
+        raise AttributeError(attr)
+
+# For some strange reason, it is not possible to add an attribute
+# to a HySymbol inside __init__. That's the reason for having
+# a pseudo-constructor function for making a symbol with a namespace.
+
+def HyNamespacedSymbol(s, ns=None):
+    s = HySymbol(s)
+    if ns is not None:
+        s.namespace = ns
+    return s

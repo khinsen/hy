@@ -595,6 +595,8 @@ class HyASTCompiler(object):
                 level -= 1
 
         name = form.__class__.__name__
+        if name == 'HySymbol':
+            name = 'HyNamespacedSymbol'
         imports = set([name])
 
         if isinstance(form, (HyList, HyDict)):
@@ -619,7 +621,17 @@ class HyASTCompiler(object):
             return imports, HyExpression([HySymbol(name),
                                           contents]).replace(form), False
 
-        elif isinstance(form, (HySymbol, HyLambdaListKeyword)):
+        elif isinstance(form, HySymbol):
+            if level > 0 or self.module_name == "__console__":
+                expr = HyExpression([HySymbol(name),
+                                     HyString(form)]).replace(form)
+            else:
+                expr = HyExpression([HySymbol(name),
+                                     HyString(form),
+                                     HyString(self.module_name)]).replace(form)
+            return imports, expr, False
+
+        elif isinstance(form, HyLambdaListKeyword):
             return imports, HyExpression([HySymbol(name),
                                           HyString(form)]).replace(form), False
 
@@ -1796,6 +1808,11 @@ class HyASTCompiler(object):
 
     @builds(HySymbol)
     def compile_symbol(self, symbol):
+        ns = symbol.namespace
+        if ns is not None:
+            self.imports[ns].add(None)
+            symbol = HySymbol(ns+'.'+symbol).replace(symbol)
+
         if "." in symbol:
             glob, local = symbol.rsplit(".", 1)
             glob = HySymbol(glob).replace(symbol)

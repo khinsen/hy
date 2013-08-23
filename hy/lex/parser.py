@@ -32,7 +32,7 @@ from hy.models.keyword import HyKeyword
 from hy.models.lambdalist import HyLambdaListKeyword
 from hy.models.list import HyList
 from hy.models.string import HyString
-from hy.models.symbol import HySymbol
+from hy.models.symbol import HySymbol, HyNamespacedSymbol
 
 from .lexer import lexer
 from .exceptions import LexException, PrematureEndOfInput
@@ -237,6 +237,11 @@ def t_identifier(p):
 
     if "-" in obj and obj != "-":
         obj = obj.replace("-", "_")
+
+    if "/" in obj:
+        split_at = obj.find("/")
+        if split_at > len(obj)-1:
+            return HyNamespacedSymbol(obj[split_at+1:], obj[:split_at])
 
     return HySymbol(obj)
 
